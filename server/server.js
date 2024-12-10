@@ -33,6 +33,26 @@ app.post("/createUser", async (req, res) => {
   res.json(req.body);
 });
 
+
+//Import Admin Model
+const AdminModel = require("./models/Admins");
+
+app.post("/register" , async (req , res) => {
+  const {username , password} = req.body ;
+  const admin = await AdminModel.findOne({username})
+  if (admin) {
+    return res.json({message : "User already exists"})
+  }
+});
+
+
+
+
+
+
+
+
+
 app.listen(_PORT, () => {
   console.log("Server Works well!!");
 });
