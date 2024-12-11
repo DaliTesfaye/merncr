@@ -62,6 +62,18 @@ app.post("/admin", async (req, res) => {
   }
 });
 
+
+app.post("/login" , async (req , res) => {
+  const {username , password} = req.body ;
+
+  const admin = await AdminModel.findOne({username});
+  !admin && res.json({message : "Admin doesnt exist"});
+
+  const isPasswordValid = await bcrypt.compare(password , admin.password);
+  !isPasswordValid && res.json({message : "Username or password are incorrect"});
+
+})
+
 app.listen(_PORT, () => {
   console.log("Server Works well!!");
 });
