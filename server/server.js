@@ -33,23 +33,28 @@ app.post("/createUser", async (req, res) => {
   res.json(req.body);
 });
 
-
 //Import Admin Model
-const AdminModel = require("./models/Admins");
+const AdminModel = require("./models/Admins")
 
-app.post("/register" , async (req , res) => {
+app.post("/admin" , async (req , res) => {
   const {username , password} = req.body ;
-  const admin = await AdminModel.findOne({username})
-  if (admin) {
-    return res.json({message : "User already exists"})
+
+  try{
+    const admin = await AdminModel.findOne({username})
+    if (admin) {
+      return res.status(400).json({message : "admin already exists"})
+    }
+
+    const newAdmin = new AdminModel({username , password});
+    await newAdmin.save();
+
+    return res.status(201).json({message : "Admin Created Successfully"})
   }
-});
-
-
-
-
-
-
+  catch(error){
+    console.error(error)
+    return res.status(500).json({message : "Internal Server Error"})
+  }
+})
 
 
 
