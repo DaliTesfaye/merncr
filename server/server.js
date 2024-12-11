@@ -1,11 +1,13 @@
 //Create Server
 const express = require("express");
 const app = express();
-const _PORT = "3001" ;
+const _PORT = "3001";
 
 const cors = require("cors");
 app.use(cors());
 app.use(express.json());
+
+const bcrypt = require("bcrypt");
 
 //Connect mongoDB to server
 const username = "drididali93",
@@ -34,29 +36,31 @@ app.post("/createUser", async (req, res) => {
 });
 
 //Import Admin Model
-const AdminModel = require("./models/Admins")
+const AdminModel = require("./models/Admins");
 
-app.post("/admin" , async (req , res) => {
-  const {username , password} = req.body ;
+app.post("/admin", async (req, res) => {
+  const { username, password } = req.body;
 
-  try{
-    const admin = await AdminModel.findOne({username})
+  try {
+    const admin = await AdminModel.findOne({ username });
     if (admin) {
-      return res.status(400).json({message : "admin already exists"})
+      return res.status(400).json({ message: "admin already exists" });
     }
 
-    const newAdmin = new AdminModel({username , password});
+    const hashedPassword = bcrypt.hashSync(password, 10);
+
+    const newAdmin = new AdminModel({
+      username: username,
+      password: hashedPassword,
+    });
     await newAdmin.save();
 
-    return res.status(201).json({message : "Admin Created Successfully"})
+    return res.status(201).json({ message: "Admin Created Successfully" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
-  catch(error){
-    console.error(error)
-    return res.status(500).json({message : "Internal Server Error"})
-  }
-})
-
-
+});
 
 app.listen(_PORT, () => {
   console.log("Server Works well!!");
